@@ -20,7 +20,7 @@ data class AuthenticateResponse(
     val id: String,
     val email: String,
     val name: String,
-    val age: UInt,
+    val age: Int,
     val sex: Sex,
     val height: Float,
     val weight: Float,

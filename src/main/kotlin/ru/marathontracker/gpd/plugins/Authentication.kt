@@ -5,10 +5,15 @@ import com.auth0.jwt.algorithms.Algorithm
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
 import io.ktor.server.auth.jwt.*
-import ru.marathontracker.gpd.authorization.security.hashing.HashingService
+import org.koin.core.parameter.parametersOf
+import org.koin.core.qualifier.named
+import org.koin.ktor.ext.inject
+import ru.marathontracker.gpd.authorization.di.*
 import ru.marathontracker.gpd.authorization.security.token.TokenConfig
 
-fun Application.configureAuthentication(hashingService: HashingService, tokenConfig: TokenConfig) {
+fun Application.configureAuthentication() {
+    val tokenParams by inject<TokenParams>{ parametersOf(environment) }
+    val tokenConfig by inject<TokenConfig>(named(TokenConfigNames.ACCESS)) { parametersOf(tokenParams) }
     install(Authentication) {
         jwt {
             realm = "REALM"

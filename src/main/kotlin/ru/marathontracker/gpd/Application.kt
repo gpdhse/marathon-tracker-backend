@@ -10,6 +10,8 @@ fun main(args: Array<String>) = EngineMain.main(args)
 fun Application.module() {
     configureKoin() // important to configure before others configurations
 
+    configureAuthentication()
+    configureDefaultHeaders()
     configureMonitoring()
     configureRouting()
     configureSockets()

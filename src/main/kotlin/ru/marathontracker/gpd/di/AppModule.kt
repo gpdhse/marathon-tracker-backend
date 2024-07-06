@@ -5,5 +5,5 @@ import org.koin.dsl.module
 
 val appModule = module {
     single { (uri: String) -> MongoClient.create(uri) }
-    single { params -> params.get<MongoClient>().getDatabase(params.get()) }
+    single { (client: MongoClient, database: String) -> client.getDatabase(database) }
 }

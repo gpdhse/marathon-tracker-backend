@@ -1,9 +1,12 @@
 package ru.marathontracker.gpd.authorization.di
 
+import com.mongodb.kotlin.client.coroutine.MongoDatabase
+import io.ktor.server.application.*
+import io.ktor.server.config.*
 import org.koin.core.module.dsl.singleOf
 import org.koin.core.qualifier.named
 import org.koin.dsl.*
-import ru.marathontracker.gpd.authorization.security.hashing.Sha256HashingService
+import ru.marathontracker.gpd.authorization.security.hashing.*
 import ru.marathontracker.gpd.authorization.security.token.*
 import ru.marathontracker.gpd.authorization.services.*
 import ru.marathontracker.gpd.util.TokenLifetime
@@ -21,8 +24,18 @@ object TokenConfigNames {
 
 val authorizationModule = module {
     singleOf(::JWTTokenService) bind TokenService::class
-    singleOf(::Sha256HashingService) bind Sha256HashingService::class
-    singleOf(::MongoRefreshTokenService) bind RefreshTokenService::class
+    singleOf(::Sha256HashingService) bind HashingService::class
+    single { (database: MongoDatabase) ->
+        MongoRefreshTokenService(database)
+    } bind RefreshTokenService::class
+
+    factory { (environment: ApplicationEnvironment?) ->
+        TokenParams(
+            issuer = environment?.config?.tryGetString("jwt.issuer") ?: "",
+            audience = environment?.config?.tryGetString("jwt.audience") ?: "",
+            secret = environment?.config?.tryGetString("jwt.secret") ?: "",
+        )
+    }
 
     factory(named(TokenConfigNames.REFRESH)) { (params: TokenParams) ->
         TokenConfig(

@@ -133,24 +133,30 @@ private fun Route.refresh(
     refreshTokenService: RefreshTokenService,
     accessTokenConfig: TokenConfig,
     refreshTokenConfig: TokenConfig,
-) = get("/refresh") {
+) = post("/refresh") {
     val oldRefreshToken =
-        call.parameters["refreshToken"] ?: return@get call.respond(HttpStatusCode.BadRequest, "Invalid refresh token")
+         runCatching {
+             call.receive<RefreshRequest>().token
+         }.getOrElse{return@post call.respond(HttpStatusCode.BadRequest, "Invalid refresh token")}
 
-    val token = refreshTokenService.delete(oldRefreshToken).getOrElse {
-        return@get call.respond(status = HttpStatusCode.NotFound, message = "Refresh token does not exist")
+    println(oldRefreshToken)
+
+    val token = refreshTokenService.deleteByRefreshToken(oldRefreshToken).getOrElse {
+        return@post call.respond(status = HttpStatusCode.NotFound, message = "Refresh token does not exist")
     }.refreshToken
 
     val jwt = JWT.decode(token)
     val id = runCatching { jwt.getClaim("id").asString() }.getOrElse {
-        return@get call.respond(status = HttpStatusCode.InternalServerError, message = "Something went wrong")
+        return@post call.respond(status = HttpStatusCode.InternalServerError, message = "Something went wrong")
     }
-    val deviceId = runCatching { jwt.getClaim("deviceId").asString() }.getOrElse {
-        return@get call.respond(status = HttpStatusCode.InternalServerError, message = "Something went wrong")
+    println(id)
+    val deviceId = runCatching { jwt.getClaim("device_id").asString() }.getOrElse {
+        return@post call.respond(status = HttpStatusCode.InternalServerError, message = "Something went wrong")
     }
+    println(deviceId)
 
     val user = userService.read(id).getOrElse {
-        return@get call.respond(status = HttpStatusCode.NotFound, message = "User not found")
+        return@post call.respond(status = HttpStatusCode.NotFound, message = "User not found")
     }
 
     val (accessToken, refreshToken) = makeTokens(
@@ -161,7 +167,7 @@ private fun Route.refresh(
         deviceId
     ).also {
         refreshTokenService.create(RefreshTokenDTO(refreshToken = it[1])).getOrElse {
-            return@get call.respond(
+            return@post call.respond(
                 status = HttpStatusCode.InternalServerError,
                 message = "Refresh token cannot be saved"
             )

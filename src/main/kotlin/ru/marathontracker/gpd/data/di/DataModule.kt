@@ -1,9 +1,11 @@
 package ru.marathontracker.gpd.data.di
 
-import org.koin.core.module.dsl.singleOf
+import com.mongodb.kotlin.client.coroutine.MongoDatabase
 import org.koin.dsl.*
 import ru.marathontracker.gpd.data.services.user.*
 
 val dataModule = module {
-    singleOf(::MongoUserService) bind UserService::class
+    single {(database: MongoDatabase) ->
+        MongoUserService(database)
+    } bind UserService::class
 }

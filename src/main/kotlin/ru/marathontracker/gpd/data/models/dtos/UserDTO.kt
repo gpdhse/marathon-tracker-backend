@@ -11,7 +11,7 @@ data class UserDTO(
     val id: ObjectId = ObjectId(),
     val email: String,
     val name: String,
-    val age: UInt,
+    val age: Int,
     val sex: Sex,
     val height: Float,
     val weight: Float,
