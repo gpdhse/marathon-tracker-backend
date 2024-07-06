@@ -7,8 +7,7 @@ import io.ktor.server.config.*
 import io.ktor.server.routing.*
 import org.koin.core.parameter.parametersOf
 import org.koin.ktor.ext.inject
-import ru.marathontracker.gpd.data.services.UserService
-import ru.marathontracker.gpd.routes.user.userRoutes
+import ru.marathontracker.gpd.data.services.user.UserService
 
 fun Application.configureRouting() {
     routing {
@@ -23,6 +22,5 @@ fun Application.configureRouting() {
         val client by inject<MongoClient> { parametersOf(uri) }
         val database by inject<MongoDatabase> { parametersOf(client, databaseName) }
         val userService by inject<UserService> { parametersOf(database) }
-        userRoutes(userService)
     }
 }

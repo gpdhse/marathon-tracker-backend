@@ -1,33 +1,33 @@
 package ru.marathontracker.gpd.data.models.responses
 
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
-import ru.marathontracker.gpd.data.models.dtos.UserDTO
+import kotlinx.serialization.*
 
-interface UserResponse {
-    val message: String
-}
+@Serializable
+data class UserResponse(
+    val id: String,
+    val login: String,
+)
 
 @Serializable
 data class CreateUserResponse(
-    override val message: String,
+    val message: String,
     val id: String,
-) : UserResponse
+)
 
 @Serializable
 data class ReadUserResponse(
-    override val message: String,
-    val user: UserDTO,
-) : UserResponse
+    val message: String,
+    val user: UserResponse,
+)
 
 @Serializable
 data class UpdateUserResponse(
-    override val message: String,
-    @SerialName("old_user") val oldUser: UserDTO,
-) : UserResponse
+    val message: String,
+    @SerialName("old_user") val oldUser: UserResponse,
+)
 
 @Serializable
 data class DeleteUserResponse(
-    override val message: String,
-    @SerialName("deleted_user") val deletedUser: UserDTO,
-) : UserResponse
+    val message: String,
+    @SerialName("deleted_user") val deletedUser: UserResponse,
+)
