@@ -1,4 +1,4 @@
-package ru.marathontracker.gpd.authorization.routes
+package ru.marathontracker.gpd.routes.authorization
 
 import com.auth0.jwt.JWT
 import io.ktor.http.*
@@ -8,15 +8,14 @@ import io.ktor.server.auth.jwt.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
-import ru.marathontracker.gpd.authorization.mapper.*
-import ru.marathontracker.gpd.authorization.models.dtos.RefreshTokenDTO
-import ru.marathontracker.gpd.authorization.models.requests.*
-import ru.marathontracker.gpd.authorization.models.responses.*
 import ru.marathontracker.gpd.authorization.security.hashing.HashingService
 import ru.marathontracker.gpd.authorization.security.token.*
-import ru.marathontracker.gpd.authorization.services.RefreshTokenService
-import ru.marathontracker.gpd.data.models.dtos.UserDTO
+import ru.marathontracker.gpd.data.mapper.*
+import ru.marathontracker.gpd.data.models.dtos.*
+import ru.marathontracker.gpd.data.services.refreshToken.RefreshTokenService
 import ru.marathontracker.gpd.data.services.user.UserService
+import ru.marathontracker.gpd.models.requests.authorization.*
+import ru.marathontracker.gpd.models.responses.authorization.*
 
 fun Routing.authorizationRoutes(
     userService: UserService,
@@ -139,8 +138,6 @@ private fun Route.refresh(
              call.receive<RefreshRequest>().token
          }.getOrElse{return@post call.respond(HttpStatusCode.BadRequest, "Invalid refresh token")}
 
-    println(oldRefreshToken)
-
     val token = refreshTokenService.deleteByRefreshToken(oldRefreshToken).getOrElse {
         return@post call.respond(status = HttpStatusCode.NotFound, message = "Refresh token does not exist")
     }.refreshToken
@@ -149,11 +146,9 @@ private fun Route.refresh(
     val id = runCatching { jwt.getClaim("id").asString() }.getOrElse {
         return@post call.respond(status = HttpStatusCode.InternalServerError, message = "Something went wrong")
     }
-    println(id)
     val deviceId = runCatching { jwt.getClaim("device_id").asString() }.getOrElse {
         return@post call.respond(status = HttpStatusCode.InternalServerError, message = "Something went wrong")
     }
-    println(deviceId)
 
     val user = userService.read(id).getOrElse {
         return@post call.respond(status = HttpStatusCode.NotFound, message = "User not found")

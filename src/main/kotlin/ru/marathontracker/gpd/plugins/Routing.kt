@@ -8,11 +8,13 @@ import org.koin.core.parameter.parametersOf
 import org.koin.core.qualifier.named
 import org.koin.ktor.ext.inject
 import ru.marathontracker.gpd.authorization.di.*
-import ru.marathontracker.gpd.authorization.routes.authorizationRoutes
 import ru.marathontracker.gpd.authorization.security.hashing.HashingService
 import ru.marathontracker.gpd.authorization.security.token.*
-import ru.marathontracker.gpd.authorization.services.RefreshTokenService
+import ru.marathontracker.gpd.data.services.admin.AdminService
+import ru.marathontracker.gpd.data.services.refreshToken.RefreshTokenService
 import ru.marathontracker.gpd.data.services.user.UserService
+import ru.marathontracker.gpd.routes.admin.adminAuthorizationRoutes
+import ru.marathontracker.gpd.routes.authorization.authorizationRoutes
 
 data class MongoConfig(
     val user: String? = null,
@@ -40,6 +42,7 @@ fun Application.configureRouting() {
         val client by inject<MongoClient> { parametersOf(uri) }
         val database by inject<MongoDatabase> { parametersOf(client, mongo.database) }
         val userService by inject<UserService> { parametersOf(database) }
+        val adminService by inject<AdminService> { parametersOf(database) }
         val tokenParams by inject<TokenParams> { parametersOf(environment) }
         val accessTokenConfig by inject<TokenConfig>(named(TokenConfigNames.ACCESS)) { parametersOf(tokenParams) }
         val refreshTokenConfig by inject<TokenConfig>(named(TokenConfigNames.REFRESH)) { parametersOf(tokenParams) }
@@ -49,6 +52,15 @@ fun Application.configureRouting() {
 
         authorizationRoutes(
             userService,
+            tokenService,
+            hashingService,
+            refreshTokenService,
+            accessTokenConfig,
+            refreshTokenConfig,
+        )
+
+        adminAuthorizationRoutes(
+            adminService,
             tokenService,
             hashingService,
             refreshTokenService,

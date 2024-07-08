@@ -1,6 +1,5 @@
 package ru.marathontracker.gpd.authorization.di
 
-import com.mongodb.kotlin.client.coroutine.MongoDatabase
 import io.ktor.server.application.*
 import io.ktor.server.config.*
 import org.koin.core.module.dsl.singleOf
@@ -8,7 +7,6 @@ import org.koin.core.qualifier.named
 import org.koin.dsl.*
 import ru.marathontracker.gpd.authorization.security.hashing.*
 import ru.marathontracker.gpd.authorization.security.token.*
-import ru.marathontracker.gpd.authorization.services.*
 import ru.marathontracker.gpd.util.TokenLifetime
 
 data class TokenParams(
@@ -25,9 +23,6 @@ object TokenConfigNames {
 val authorizationModule = module {
     singleOf(::JWTTokenService) bind TokenService::class
     singleOf(::Sha256HashingService) bind HashingService::class
-    single { (database: MongoDatabase) ->
-        MongoRefreshTokenService(database)
-    } bind RefreshTokenService::class
 
     factory { (environment: ApplicationEnvironment?) ->
         TokenParams(
@@ -45,6 +40,7 @@ val authorizationModule = module {
             TokenLifetime.REFRESH,
         )
     }
+
     factory(named(TokenConfigNames.ACCESS)) { (params: TokenParams) ->
         TokenConfig(
             params.issuer,

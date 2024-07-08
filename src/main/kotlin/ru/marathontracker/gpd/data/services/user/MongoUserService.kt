@@ -1,10 +1,9 @@
 package ru.marathontracker.gpd.data.services.user
 
-import com.mongodb.client.model.Filters
+import com.mongodb.client.model.*
 import com.mongodb.kotlin.client.coroutine.MongoDatabase
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.firstOrNull
-import kotlinx.coroutines.withContext
 import org.bson.types.ObjectId
 import ru.marathontracker.gpd.data.models.dtos.UserDTO
 import ru.marathontracker.gpd.util.ID_FIELD
@@ -14,6 +13,7 @@ class MongoUserService(database: MongoDatabase) : UserService {
     private val collection = database.getCollection<UserDTO>(COLLECTION_NAME)
 
     override suspend fun create(userDTO: UserDTO): Result<String> = withContext(Dispatchers.IO) {
+        collection.createIndex(Indexes.descending(UserDTO::email.name), IndexOptions().unique(true))
         when (val id = collection.insertOne(userDTO).insertedId?.asObjectId()?.value?.toHexString()) {
             null -> Result.failure(NullPointerException("User cannot be inserted"))
             else -> Result.success(id)

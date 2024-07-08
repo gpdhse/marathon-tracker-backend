@@ -1,5 +1,6 @@
 @file:Suppress("PropertyName", "SpellCheckingInspection")
 
+
 val kotlin_version: String by project
 val logback_version: String by project
 val mongo_version: String by project

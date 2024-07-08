@@ -1,10 +1,10 @@
-package ru.marathontracker.gpd.authorization.mapper
+package ru.marathontracker.gpd.data.mapper
 
-import ru.marathontracker.gpd.authorization.models.requests.SignUpRequest
-import ru.marathontracker.gpd.authorization.models.responses.AuthenticateResponse
 import ru.marathontracker.gpd.authorization.security.hashing.SaltedHash
 import ru.marathontracker.gpd.authorization.security.token.TokenClaim
 import ru.marathontracker.gpd.data.models.dtos.UserDTO
+import ru.marathontracker.gpd.models.requests.authorization.SignUpRequest
+import ru.marathontracker.gpd.models.responses.authorization.AuthenticateResponse
 import ru.marathontracker.gpd.util.*
 
 fun UserDTO.toAccessTokenClaims(deviceId: String): Array<TokenClaim> {

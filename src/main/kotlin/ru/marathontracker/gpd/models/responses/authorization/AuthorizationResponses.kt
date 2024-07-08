@@ -1,4 +1,4 @@
-package ru.marathontracker.gpd.authorization.models.responses
+package ru.marathontracker.gpd.models.responses.authorization
 
 import kotlinx.serialization.*
 import ru.marathontracker.gpd.util.Sex

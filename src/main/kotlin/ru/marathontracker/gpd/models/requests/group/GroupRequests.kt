@@ -1,4 +1,4 @@
-package ru.marathontracker.gpd.data.models.requests
+package ru.marathontracker.gpd.models.requests.group
 
 import kotlinx.serialization.Serializable
 
