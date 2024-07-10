@@ -39,9 +39,9 @@ fun Application.configureRouting() {
             )
         } ?: return@routing
 
-        val credentials =
-            mongo.user?.let { userVal -> mongo.password?.let { passwordVal -> "$userVal:$passwordVal@" } }.orEmpty()
-        val uri = "mongodb://$credentials${mongo.host}:${mongo.port}/"
+//        val credentials =
+//            mongo.user?.let { userVal -> mongo.password?.let { passwordVal -> "$userVal:$passwordVal@" } }.orEmpty()
+        val uri = "mongodb://${mongo.host}:${mongo.port}/"
         val client by inject<MongoClient> { parametersOf(uri) }
         val database by inject<MongoDatabase> { parametersOf(client, mongo.database) }
         val userService by inject<UserService> { parametersOf(database) }

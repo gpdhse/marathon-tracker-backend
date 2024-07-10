@@ -1,0 +1,40 @@
+version: "3.6"
+services:
+  app:
+    image: ephirium/marathon-tracker-backend:latest
+    build: ./
+    container_name: marathon-tracker-backend
+    volumes:
+      - ./:/marathon-tracker-backend
+    ports:
+      - "8080:8080"
+    expose:
+      - 8080
+    depends_on:
+      - db
+    networks:
+      - mongo
+    restart: always
+    environment:
+      PORT: 8080
+      JWT_AUDIENCE: $JWT_AUDIENCE
+      JWT_ISSUER: $JWT_ISSUER
+      JWT_SECRET: $JWT_SECRET
+      JWT_REALM: $JWT_REALM
+      MONGO_HOST: $MONGO_HOST
+      MONGO_PORT: $MONGO_PORT
+      MONGO_USER: $MONGO_USER
+      MONGO_PASSWORD: $MONGO_PASSWORD
+  db:
+    image: arm64v8/mongo:latest
+    container_name: "mongo"
+    ports:
+      - "27017:27017"
+    volumes:
+      - ./localvolumes/mongo:/data/db
+    networks:
+      - mongo
+    restart: always
+networks:
+  mongo:
+    driver: bridge

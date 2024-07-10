@@ -1,5 +1,6 @@
 package ru.marathontracker.gpd.controllers
 
+import io.ktor.util.collections.*
 import io.ktor.websocket.*
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -8,20 +9,20 @@ import ru.marathontracker.gpd.data.models.dtos.HealthStatusDTO
 import ru.marathontracker.gpd.data.services.healthStatus.HealthStatusService
 import ru.marathontracker.gpd.models.entities.health.HealthStatus
 import ru.marathontracker.gpd.util.MemberAlreadyExistsException
-import java.util.concurrent.ConcurrentHashMap
 
 class MarathonController(private val healthStatusService: HealthStatusService) {
-    private val members = ConcurrentHashMap<String, Member>()
+    private val members = ConcurrentSet<Member>()
 
     fun onJoin(member: Member) {
-        if (members.containsKey(member.username)) {
+        if (members.find { it.userId == member.userId } != null) {
             throw MemberAlreadyExistsException()
         }
-        members[member.username] = member
+        members.removeIf{ it.userId == member.userId }
+        members.add(member)
     }
 
-    suspend fun sendStatus(senderUsername: String, status: HealthStatus) {
-        members.values.forEach { member ->
+    suspend fun sendStatus(status: HealthStatus) {
+        members.forEach { member ->
             val healthStatusDTO = HealthStatusDTO(
                 userId = ObjectId(status.userId),
                 maxPressure = status.maxPressure,
@@ -46,10 +47,10 @@ class MarathonController(private val healthStatusService: HealthStatusService) {
 
     suspend fun getAllStatuses(): List<HealthStatusDTO> = healthStatusService.getAll().getOrElse { emptyList() }
 
-    suspend fun tryDisconnect(username: String){
-        if(members.containsKey(username)){
-            members[username]?.socket?.close(CloseReason(CloseReason.Codes.NORMAL, "Disconnected"))
-            members.remove(username)
+    suspend fun tryDisconnect(userId: String){
+        members.find { it.userId == userId }?.let {
+            it.socket.close(CloseReason(CloseReason.Codes.NORMAL, "Disconnected"))
+            members.remove(it)
         }
     }
 }

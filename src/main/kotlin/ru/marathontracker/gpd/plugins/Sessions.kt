@@ -8,15 +8,20 @@ import ru.marathontracker.gpd.models.sessions.MarathonSession
 import ru.marathontracker.gpd.util.AccountType
 
 fun Application.configureSessions() {
-    install(Sessions){
+    install(Sessions) {
         cookie<MarathonSession>("SESSION")
     }
 
-    intercept(Plugins){
-        if(call.sessions.get<MarathonSession>() == null){
-            val username = call.parameters["username"] ?: return@intercept
-            val accountType = Json.decodeFromString<AccountType>(call.parameters["accountType"] ?: return@intercept)
-            call.sessions.set(MarathonSession(username, accountType, generateSessionId()))
+    intercept(Plugins) {
+        if (call.sessions.get<MarathonSession>() == null) {
+            val userId = call.parameters["user_id"] ?: return@intercept
+            val accountType =
+                runCatching {
+                    Json.decodeFromString<AccountType>(
+                        string = call.parameters["account_type"] ?: return@intercept
+                    )
+                }.getOrElse { return@intercept }
+            call.sessions.set(MarathonSession(userId, accountType, generateSessionId()))
         }
     }
 }

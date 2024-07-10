@@ -26,12 +26,10 @@ private fun Route.marathonSocket(marathonController: MarathonController) = webSo
         )
     )
 
-    println(session)
-
     try {
         marathonController.onJoin(
             Member(
-                username = session.username,
+                userId = session.userId,
                 accountType = session.accountType,
                 sessionId = session.sessionId,
                 socket = this
@@ -40,7 +38,6 @@ private fun Route.marathonSocket(marathonController: MarathonController) = webSo
         incoming.consumeEach { frame ->
             (frame as? Frame.Text)?.let { text ->
                 marathonController.sendStatus(
-                    session.username,
                     Json.decodeFromString(text.readText())
                 )
             }
@@ -50,7 +47,7 @@ private fun Route.marathonSocket(marathonController: MarathonController) = webSo
     } catch (e: Exception) {
         e.printStackTrace()
     } finally {
-        marathonController.tryDisconnect(session.username)
+        marathonController.tryDisconnect(session.userId)
     }
 }
 

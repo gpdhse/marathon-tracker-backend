@@ -5,8 +5,7 @@ import ru.marathontracker.gpd.util.AccountType
 
 @Serializable
 data class MarathonSession(
-    val username: String,
+    @SerialName("user_id") val userId: String,
     @SerialName("account_type") val accountType: AccountType,
     @SerialName("session_id") val sessionId: String,
-) {
-}
+)
