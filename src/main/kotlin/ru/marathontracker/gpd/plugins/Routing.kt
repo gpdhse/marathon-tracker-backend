@@ -10,11 +10,14 @@ import org.koin.ktor.ext.inject
 import ru.marathontracker.gpd.authorization.di.*
 import ru.marathontracker.gpd.authorization.security.hashing.HashingService
 import ru.marathontracker.gpd.authorization.security.token.*
+import ru.marathontracker.gpd.controllers.MarathonController
 import ru.marathontracker.gpd.data.services.admin.AdminService
+import ru.marathontracker.gpd.data.services.healthStatus.HealthStatusService
 import ru.marathontracker.gpd.data.services.refreshToken.RefreshTokenService
 import ru.marathontracker.gpd.data.services.user.UserService
 import ru.marathontracker.gpd.routes.admin.adminAuthorizationRoutes
 import ru.marathontracker.gpd.routes.authorization.authorizationRoutes
+import ru.marathontracker.gpd.routes.marathon.marathonRoutes
 
 data class MongoConfig(
     val user: String? = null,
@@ -49,6 +52,8 @@ fun Application.configureRouting() {
         val tokenService by inject<TokenService>()
         val hashingService by inject<HashingService>()
         val refreshTokenService by inject<RefreshTokenService> { parametersOf(database) }
+        val healthStatusService by inject<HealthStatusService> { parametersOf(database) }
+        val marathonController by inject<MarathonController> { parametersOf(healthStatusService) }
 
         authorizationRoutes(
             userService,
@@ -67,5 +72,7 @@ fun Application.configureRouting() {
             accessTokenConfig,
             refreshTokenConfig,
         )
+
+        marathonRoutes(marathonController)
     }
 }

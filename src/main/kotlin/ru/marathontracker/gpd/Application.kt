@@ -13,7 +13,8 @@ fun Application.module() {
     configureAuthentication()
     configureDefaultHeaders()
     configureMonitoring()
-    configureRouting()
-    configureSockets()
     configureSerialization()
+    configureSessions()
+    configureSockets() // important to configure before routing
+    configureRouting()
 }
