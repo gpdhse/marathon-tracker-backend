@@ -15,7 +15,7 @@ import ru.marathontracker.gpd.data.services.admin.AdminService
 import ru.marathontracker.gpd.data.services.healthStatus.HealthStatusService
 import ru.marathontracker.gpd.data.services.refreshToken.RefreshTokenService
 import ru.marathontracker.gpd.data.services.user.UserService
-import ru.marathontracker.gpd.routes.admin.adminAuthorizationRoutes
+import ru.marathontracker.gpd.routes.admin.*
 import ru.marathontracker.gpd.routes.authorization.authorizationRoutes
 import ru.marathontracker.gpd.routes.marathon.marathonRoutes
 
@@ -74,5 +74,7 @@ fun Application.configureRouting() {
         )
 
         marathonRoutes(marathonController)
+
+        adminRoutes()
     }
 }

@@ -25,15 +25,9 @@ class MarathonController(private val healthStatusService: HealthStatusService) {
         members.forEach { member ->
             val healthStatusDTO = HealthStatusDTO(
                 userId = ObjectId(status.userId),
-                maxPressure = status.maxPressure,
-                minPressure = status.minPressure,
-                avgPressure = status.avgPressure,
-                longitude = status.longitude,
+                pulse = status.pulse,
                 latitude = status.latitude,
-                time = status.time,
-                speed = status.speed,
-                avgSpeed = status.avgSpeed,
-                distance = status.distance,
+                longitude = status.longitude,
             )
 
             healthStatusService.createOrReplace(healthStatusDTO).getOrElse {
