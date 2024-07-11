@@ -13,8 +13,8 @@ data class UserDTO(
     val name: String,
     val age: Int,
     val sex: Sex,
-    val height: Float,
-    val weight: Float,
+    val height: Int,
+    val weight: Int,
     val phone: String,
     @BsonProperty("salted_hash") val saltedHash: SaltedHash,
 ) : Principal
