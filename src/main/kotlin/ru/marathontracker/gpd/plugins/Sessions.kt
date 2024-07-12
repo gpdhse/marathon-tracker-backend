@@ -18,7 +18,7 @@ fun Application.configureSessions() {
             val accountType =
                 runCatching {
                     Json.decodeFromString<AccountType>(
-                        string = call.parameters["account_type"] ?: return@intercept
+                        string = "\"${call.parameters["account_type"] ?: return@intercept}\""
                     )
                 }.getOrElse { return@intercept }
             call.sessions.set(MarathonSession(userId, accountType, generateSessionId()))

@@ -16,6 +16,7 @@ import ru.marathontracker.gpd.util.MemberAlreadyExistsException
 fun Routing.marathonRoutes(marathonController: MarathonController) = route("/marathon") {
     marathonSocket(marathonController)
     getAllStatuses(marathonController)
+    sos()
 }
 
 private fun Route.marathonSocket(marathonController: MarathonController) = webSocket("/connection") {
@@ -56,4 +57,8 @@ private fun Route.getAllStatuses(marathonController: MarathonController) = get("
         HttpStatusCode.OK,
         marathonController.getAllStatuses()
     )
+}
+
+private fun Route.sos() = get("/sos"){
+    call.respond(HttpStatusCode.OK, "sos")
 }

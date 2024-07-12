@@ -20,7 +20,7 @@ class MongoHealthStatusService(database: MongoDatabase) : HealthStatusService {
         when (collection.find(Filters.eq(ID_FIELD, healthStatus.id)).firstOrNull()) {
             null -> create(healthStatus)
             else -> replace(healthStatus)
-        }
+        }.also{ println(it) }
     }
 
     private suspend fun create(healthStatus: HealthStatusDTO): Result<Unit> = withContext(Dispatchers.IO) {
